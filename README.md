@@ -35,4 +35,4 @@ readFileSync方法用于同步读取文件，返回一个字符串。
 	// 方法二，根据当前系统处理
 	var EOL = (process.platform === 'win32' ? '\r\n' : '\n')
 
-##writeFileSync()
+##2、writeFileSync()
