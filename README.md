@@ -36,3 +36,61 @@ readFileSync方法用于同步读取文件，返回一个字符串。
 	var EOL = (process.platform === 'win32' ? '\r\n' : '\n')
 
 ##2、writeFileSync()
+语法：
+代码如下:
+
+	fs.writeFileSync(filename, data, [options])
+	
+接收参数：
+
+filename      (String)            文件名称
+
+data        (String | Buffer)    将要写入的内容，可以使字符串 或 buffer数据。
+
+options        (Object)           option数组对象，包含：
+
+· encoding   (string)            可选值，默认 ‘utf8′，当data使buffer时，该值应该为 ignored。
+
+· mode         (Number)        文件读写权限，默认值 438
+
+· flag            (String)            默认值 ‘w'
+
+例子：
+
+代码如下:
+
+	fs.writeFileSync('message.txt', 'Hello Node');
+	
+源码：
+
+代码如下:
+
+	fs.writeFileSync = function(path, data, options) {
+		if (!options) {
+    		options = { encoding: 'utf8', mode: 438 /*=0666*/, flag: 'w' };
+    	} else if (util.isString(options)) {
+    		options = { encoding: options, mode: 438, flag: 'w' };
+    	} else if (!util.isObject(options)) {
+    throw new TypeError('Bad arguments');
+    
+    	}
+    
+    	assertEncoding(options.encoding);
+    	var flag = options.flag || 'w';
+    	var fd = fs.openSync(path, flag, options.mode);
+    	if (!util.isBuffer(data)) {
+    		data = new Buffer('' + data, options.encoding || 'utf8');
+    	}
+    	var written = 0;
+    	var length = data.length;
+    	var position = /a/.test(flag) ? null : 0;
+    	try {
+    		while (written < length) {
+    			written += fs.writeSync(fd, data, written, length - written, position);
+      			position += written;
+    		}
+    	} finally {
+    		fs.closeSync(fd);
+    	}
+    };
+
